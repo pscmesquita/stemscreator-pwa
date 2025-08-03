@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StemsCreator - AI Audio Separation</title>
+    
+    <!-- PWA Meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="StemsCreator">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+        
+        .upload-area {
+            border: 3px dashed #4ecdc4;
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-container {
+            display: none;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #a0a0a0;
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .stem-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .stem-name {
+            flex-grow: 1;
+            font-weight: bold;
+        }
+        
+        .stem-download {
+            background: #4ecdc4;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .download-all {
+            margin-top: 20px;
+        }
+        
+        .error {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 StemsCreator</h1>
+            <p>Professional AI Audio Separation</p>
+        </div>
+        
+        <div class="error" id="errorMessage"></div>
+        <div class="success" id="successMessage"></div>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">🎧</div>
+            <div class="upload-text">Drop your audio file here</div>
+            <div class="upload-hint">or click to browse</div>
+            <div class="upload-hint">Supports MP3, WAV, FLAC, M4A, AAC, OGG</div>
+        </div>
+        
+        <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.m4a,.aac,.ogg">
+        
+        <button class="btn" id="uploadBtn" style="display:none;">
+            🚀 Separate Audio with AI
+        </button>
+        
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+        
+        <div class="results" id="results">
+            <h3>✅ Separation Complete!</h3>
+            <p style="color: #a0a0a0; margin-bottom: 20px;">Your stems are ready for download</p>
+            
+            <div id="stemsList"></div>
+            
+            <button class="btn download-all" id="downloadAllBtn">
+                📦 Download All Stems (ZIP)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentJobId = null;
+        let selectedFile = null;
+        
+        // Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const results = document.getElementById('results');
+        const stemsList = document.getElementById('stemsList');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadBtn.addEventListener('click', uploadFile);
+        downloadAllBtn.addEventListener('click', downloadAll);
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectFile(files[0]);
+            }
+        }
+        
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                selectFile(e.target.files[0]);
+            }
+        }
+        
+        function selectFile(file) {
+            const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/m4a', 'audio/aac', 'audio/ogg'];
+            
+            if (!allowedTypes.some(type => file.type.startsWith('audio/')) && 
+                !file.name.toLowerCase().match(/\.(mp3|wav|flac|m4a|aac|ogg)$/)) {
+                showError('Please select a valid audio file (MP3, WAV, FLAC, M4A, AAC, OGG)');
+                return;
+            }
+            
+            selectedFile = file;
+            uploadArea.innerHTML = `
+                <div class="upload-icon">🎵</div>
+                <div class="upload-text">${file.name}</div>
+                <div class="upload-hint">Ready to process</div>
+            `;
+            uploadBtn.style.display = 'block';
+            hideMessages();
+        }
+        
+        async function uploadFile() {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('audio', selectedFile);
+            
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '🔄 Uploading...';
+            hideMessages();
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentJobId = result.job_id;
+                    showProgress();
+                    pollStatus();
+                } else {
+                    showError(result.error || 'Upload failed');
+                    resetUI();
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+                resetUI();
+            }
+        }
+        
+        function showProgress() {
+            progressContainer.style.display = 'block';
+            uploadBtn.style.display = 'none';
+            results.style.display = 'none';
+        }
+        
+        async function pollStatus() {
+            if (!currentJobId) return;
+            
+            try {
+                const response = await fetch(`/api/status/${currentJobId}`);
+                const status = await response.json();
+                
+                if (response.ok) {
+                    updateProgress(status);
+                    
+                    if (status.status === 'completed') {
+                        showResults(status.files);
+                    } else if (status.status === 'error') {
+                        showError(status.error || 'Processing failed');
+                        resetUI();
+                    } else {
+                        // Continue polling
+                        setTimeout(pollStatus, 2000);
+                    }
+                } else {
+                    showError('Failed to get status');
+                    resetUI();
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+                resetUI();
+            }
+        }
+        
+        function updateProgress(status) {
+            const progress = status.progress || 0;
+            progressFill.style.width = progress + '%';
+            
+            if (status.status === 'processing') {
+                progressText.textContent = `Processing with AI... ${progress}%`;
+            } else {
+                progressText.textContent = 'Processing...';
+            }
+        }
+        
+        function showResults(files) {
+            progressContainer.style.display = 'none';
+            results.style.display = 'block';
+            
+            const stemNames = {
+                'vocals.wav': '🎤 Vocals',
+                'drums.wav': '🥁 Drums',
+                'bass.wav': '🎸 Bass',
+                'other.wav': '🎹 Other',
+                'instrumental.wav': '🎵 Instrumental'
+            };
+            
+            stemsList.innerHTML = files.map(file => `
+                <div class="stem-item">
+                    <div class="stem-name">${stemNames[file] || file}</div>
+                    <button class="stem-download" onclick="downloadStem('${file}')">
+                        Download
+                    </button>
+                </div>
+            `).join('');
+            
+            showSuccess('🎉 AI separation completed successfully!');
+        }
+        
+        function downloadStem(filename) {
+            if (!currentJobId) return;
+            window.open(`/api/download/${currentJobId}/${filename}`);
+        }
+        
+        function downloadAll() {
+            if (!currentJobId) return;
+            window.open(`/api/download/${currentJobId}`);
+        }
+        
+        function resetUI() {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = '🚀 Separate Audio with AI';
+            uploadBtn.style.display = selectedFile ? 'block' : 'none';
+            progressContainer.style.display = 'none';
+            results.style.display = 'none';
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+        
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>

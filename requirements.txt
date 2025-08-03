@@ -1,0 +1,7 @@
+# Requirements for the PWA web server
+flask==3.0.0
+flask-cors==4.0.0
+soundfile==0.12.1
+numpy==2.1.0
+demucs==4.0.1
+gunicorn==21.2.0
