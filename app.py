@@ -38,9 +38,10 @@ def process_audio_async(job_id, input_file, output_folder):
     try:
         processing_status[job_id] = {'status': 'processing', 'progress': 10}
         
-        # Run Demucs separation
+        # Run Demucs separation with lighter model for smaller deployment
         cmd = [
             "python", "-m", "demucs.separate",
+            "--name", "mdx_extra",  # Use lighter model
             "--out", str(output_folder),
             str(input_file)
         ]
