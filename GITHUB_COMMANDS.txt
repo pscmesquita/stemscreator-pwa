@@ -1,0 +1,16 @@
+# Manual GitHub Setup Commands
+# Run these commands AFTER creating your GitHub repository
+# Replace YOUR_ACTUAL_USERNAME with your real GitHub username
+
+# 1. Add the correct remote (replace YOUR_ACTUAL_USERNAME)
+git remote add origin https://github.com/YOUR_ACTUAL_USERNAME/stemscreator-pwa.git
+
+# 2. Rename branch to main
+git branch -M main
+
+# 3. Push to GitHub
+git push -u origin main
+
+# If you get authentication errors, you may need to:
+# - Use a Personal Access Token instead of password
+# - Or use GitHub CLI: gh auth login
