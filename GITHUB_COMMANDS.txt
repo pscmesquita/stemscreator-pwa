@@ -3,7 +3,7 @@
 # Replace YOUR_ACTUAL_USERNAME with your real GitHub username
 
 # 1. Add the correct remote (replace YOUR_ACTUAL_USERNAME)
-git remote add origin https://github.com/YOUR_ACTUAL_USERNAME/stemscreator-pwa.git
+git remote add origin https://github.com/pscmesquita/stemscreator-pwa.git
 
 # 2. Rename branch to main
 git branch -M main
