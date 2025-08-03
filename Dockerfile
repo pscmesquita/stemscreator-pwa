@@ -1,20 +1,20 @@
-# Minimal Dockerfile for Railway - Under 1GB
+# StemsCreator PWA Docker Configuration
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install only essential system dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy minimal requirements (no AI dependencies)
-COPY requirements-light.txt requirements.txt
+# Copy requirements and install Python packages
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application files
-COPY app-light.py app.py
+# Copy application code
+COPY app.py .
 COPY templates/ ./templates/
 COPY static/ ./static/
 
@@ -28,5 +28,5 @@ ENV PORT=5000
 # Expose port
 EXPOSE $PORT
 
-# Run with minimal gunicorn settings
+# Run the application
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "300", "app:app"]

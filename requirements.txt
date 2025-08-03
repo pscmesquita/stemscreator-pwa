@@ -1,7 +1,7 @@
-# Ultra-light requirements for Railway deployment - No AI dependencies
+# AI-powered requirements for professional stem separation
 flask==3.0.0
 flask-cors==4.0.0
 soundfile==0.12.1
 numpy==2.1.0
-scipy==1.11.4
+demucs==4.0.1
 gunicorn==21.2.0

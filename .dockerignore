@@ -3,10 +3,6 @@
 # Git files
 .git
 .gitignore
-*.md
-README.md
-CUSTOM_DOMAIN.md
-GITHUB_COMMANDS.txt
 
 # Development files
 __pycache__
@@ -25,7 +21,6 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
 .mypy_cache
 .pytest_cache
 .hypothesis
@@ -54,20 +49,6 @@ npm-debug.log*
 uploads/
 results/
 logs/
-
-# Deployment scripts
-push_to_github.sh
-railway.json
-
-# Documentation
-docs/
-*.txt
-*.md
-
-# Test files
-tests/
-test_*
-*_test.py
 
 # Development environment
 .env
