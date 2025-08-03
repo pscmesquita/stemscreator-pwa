@@ -1,0 +1,26 @@
+# Ultra-minimal Dockerfile for Railway 4GB limit
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install only ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+
+# Copy and install minimal requirements
+COPY requirements-light.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app files
+COPY app-light.py app.py
+COPY templates/ ./templates/
+COPY static/ ./static/
+
+# Create dirs
+RUN mkdir -p uploads results
+
+ENV PYTHONUNBUFFERED=1
+ENV PORT=5000
+
+EXPOSE $PORT
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "app:app"]

@@ -1,10 +1,7 @@
-# Minimal requirements for PWA web server - Optimized for size
+# Ultra-light requirements for Railway deployment - No AI dependencies
 flask==3.0.0
 flask-cors==4.0.0
 soundfile==0.12.1
 numpy==2.1.0
-demucs==4.0.1
+scipy==1.11.4
 gunicorn==21.2.0
-# Specify exact versions to avoid extra dependencies
-torch==2.1.0
-torchaudio==2.1.0
